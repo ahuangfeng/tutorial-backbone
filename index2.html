@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>To-do App in Backbone.js</title>
+
+  <!-- ========= -->
+  <!--    CSS    -->
+  <!-- ========= -->
+  <style type="text/css">
+    #todoapp ul {
+      list-style-type: none;
+      /* Hides bullet points from todo list */
+    }
+
+    #todo-list input.edit {
+      display: none;
+      /* Hides input box*/
+    }
+
+    #todo-list .editing label {
+      display: none;
+      /* Hides label text when .editing*/
+    }
+
+    #todo-list .editing input.edit {
+      display: inline;
+      /* Shows input text box when .editing*/
+    }
+
+    #mapid {
+      height: 500px;
+      width: 500px;
+    }
+  </style>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.css" />
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.5/leaflet.js"></script>
+
+  <link rel="stylesheet" href="./dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="./dist/MarkerCluster.Default.css" />
+  <script src="./dist/leaflet.markercluster.js"></script>
+</head>
+
+<body>
+  <!-- ========= -->
+  <!-- Your HTML -->
+  <!-- ========= -->
+
+  <section id="todoapp">
+    <header id="header">
+      <h1>Todos</h1>
+      <input id="new-todo" placeholder="What needs to be done?" autofocus>
+      <div>
+        <a href="#/">show all</a> |
+        <a href="#/pending">show pending</a> |
+        <a href="#/completed">show completed</a>
+      </div>
+    </header>
+    <section id="main">
+      <ul id="todo-list"></ul>
+    </section>
+  </section>
+  <div id="mapid"></div>
+
+  <!-- Templates -->
+  <script type="text/template" id="item-template">
+    <div class="view">
+      <input class="toggle" type="checkbox" <%= completed ? 'checked' : '' %>>
+      <label><%- title %></label>
+      <input class="edit" value="<%- title %>">
+      <button class="destroy">remove</button>
+    </div>
+  </script>
+
+  <!-- ========= -->
+  <!-- Libraries -->
+  <!-- ========= -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js"
+    type="text/javascript"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js" type="text/javascript"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone-localstorage.js/1.0/backbone.localStorage-min.js"
+    type="text/javascript"></script>
+  <script src="./lib/Spiderfier.js"></script>
+
+  <!-- =============== -->
+  <!-- Javascript code -->
+  <!-- =============== -->
+  <script src="./todo.js" type="text/javascript"></script>
+
+  <script>
+    latlng = L.latLng(39.61, -105.02);
+
+    var littleton = L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.'),
+      denver = L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.'),
+      aurora = L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.'),
+      golden = L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.');
+
+    // var cities = L.layerGroup([littleton, denver, aurora, golden]);
+    var mymap = L.map('mapid', {
+      center: latlng,
+      zoom: 8,
+      maxZoom: 16,
+      layers: []
+    });
+
+    // var oms = new OverlappingMarkerSpiderfier(mymap, {
+    //   markersWontMove: true,
+    //   markersWontHide: true,
+    //   basicFormatEvents: true
+    // });
+    // oms.addMarker(littleton);
+    // oms.addMarker(denver);
+    // oms.addMarker(aurora);
+    // oms.addMarker(golden);
+
+    var markers = L.markerClusterGroup({
+      // spiderfyOnMaxZoom: true,
+      // zoomToBoundsOnClick: false,
+      disableClusteringAtZoom : 10
+      // chunkedLoading: true
+    });
+    console.log(markers._spiderfied);
+    console.log("EOOE: ", markers._zoomOrSpiderfy)
+    // markers._zoomOrSpiderfy = function (e) {
+    //   console.log('zoomOrSpiderfy :_ ', e, this._maxZoom, this);
+    //   var cluster = e.layer,
+    //     bottomCluster = cluster;
+    //   console.log("cluster: ", cluster);
+    //   cluster.spiderfy();
+
+    //   // while (bottomCluster._childClusters.length === 1) {
+    //   //   bottomCluster = bottomCluster._childClusters[0];
+    //   // }
+
+    //   // if (bottomCluster._zoom === this._maxZoom && bottomCluster._childCount === cluster._childCount) {
+    //   //   // All child markers are contained in a single cluster from this._maxZoom to this cluster.
+    //   //   if (this.options.spiderfyOnMaxZoom) {
+    //   //     cluster.spiderfy();
+    //   //   }
+    //   // } else if (this.options.zoomToBoundsOnClick) {
+    //   //   cluster.zoomToBounds();
+    //   // }
+
+    //   // // Focus the map again for keyboard users.
+    //   if (e.originalEvent && e.originalEvent.keyCode === 13) {
+    //     this._map._container.focus();
+    //   }
+    // }
+
+    markers.addLayer(littleton);
+    markers.addLayer(denver);
+    markers.addLayer(aurora);
+    markers.addLayer(golden);
+    markers.addTo(mymap);
+
+
+
+    mymap.on('zoomend', function () {
+      console.log("Zoom: ", mymap.getZoom());
+    });
+
+    markers.on('clusterclick', function (a) {
+      // a.layer is actually a cluster
+      console.log('cluster ' + a.layer.getAllChildMarkers().length, a);
+    });
+
+
+    // oms.addListener('click', function (marker) {
+    //   console.log("Holaaa!");
+    // });
+
+
+    var accessToken = 'pk.eyJ1IjoiYWh1YW5nZmVuZyIsImEiOiJjanNrNG5wN2QwNDFjNDNqemJ6bW4wajBxIn0.ZD_FpIuz0oeP9u63TO5rzg';
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + accessToken, {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      maxZoom: 18,
+      id: 'mapbox.streets',
+      accessToken: accessToken
+    }).addTo(mymap);
+
+
+
+  </script>
+
+</body>
+
+</html>
