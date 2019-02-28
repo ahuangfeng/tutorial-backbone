@@ -124,31 +124,31 @@
     });
     console.log(markers._spiderfied);
     console.log("EOOE: ", markers._zoomOrSpiderfy)
-    markers._zoomOrSpiderfy = function (e) {
-      console.log('zoomOrSpiderfy :_ ', e, this._maxZoom, this);
-      var cluster = e.layer,
-        bottomCluster = cluster;
-      console.log("cluster: ", cluster);
-      cluster.spiderfy();
+    // markers._zoomOrSpiderfy = function (e) {
+    //   console.log('zoomOrSpiderfy :_ ', e, this._maxZoom, this);
+    //   var cluster = e.layer,
+    //     bottomCluster = cluster;
+    //   console.log("cluster: ", cluster);
+    //   cluster.spiderfy();
 
-      // while (bottomCluster._childClusters.length === 1) {
-      //   bottomCluster = bottomCluster._childClusters[0];
-      // }
+    //   // while (bottomCluster._childClusters.length === 1) {
+    //   //   bottomCluster = bottomCluster._childClusters[0];
+    //   // }
 
-      // if (bottomCluster._zoom === this._maxZoom && bottomCluster._childCount === cluster._childCount) {
-      //   // All child markers are contained in a single cluster from this._maxZoom to this cluster.
-      //   if (this.options.spiderfyOnMaxZoom) {
-      //     cluster.spiderfy();
-      //   }
-      // } else if (this.options.zoomToBoundsOnClick) {
-      //   cluster.zoomToBounds();
-      // }
+    //   // if (bottomCluster._zoom === this._maxZoom && bottomCluster._childCount === cluster._childCount) {
+    //   //   // All child markers are contained in a single cluster from this._maxZoom to this cluster.
+    //   //   if (this.options.spiderfyOnMaxZoom) {
+    //   //     cluster.spiderfy();
+    //   //   }
+    //   // } else if (this.options.zoomToBoundsOnClick) {
+    //   //   cluster.zoomToBounds();
+    //   // }
 
-      // // Focus the map again for keyboard users.
-      if (e.originalEvent && e.originalEvent.keyCode === 13) {
-        this._map._container.focus();
-      }
-    }
+    //   // // Focus the map again for keyboard users.
+    //   if (e.originalEvent && e.originalEvent.keyCode === 13) {
+    //     this._map._container.focus();
+    //   }
+    // }
 
     markers.addLayer(littleton);
     markers.addLayer(denver);
